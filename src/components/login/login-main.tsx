@@ -34,7 +34,7 @@ export function LoginMain(): JSX.Element {
                        lg:text-6xl lg:before:content-["Happening_now"]'
           />
           <h2 className='hidden text-xl lg:block lg:text-3xl'>
-            Join Twitter today.
+            Join Discusso today.
           </h2>
         </div>
         <div className='flex max-w-xs flex-col gap-6 [&_button]:py-2'>
@@ -86,11 +86,7 @@ export function LoginMain(): JSX.Element {
                 Privacy Policy
               </a>
               , including{' '}
-              <a
-                href='https://help.twitter.com/rules-and-policies/twitter-cookies'
-                target='_blank'
-                rel='noreferrer'
-              >
+              <a href='' target='_blank' rel='noreferrer'>
                 Cookie Use
               </a>
               .

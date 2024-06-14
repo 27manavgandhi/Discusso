@@ -1,124 +1,182 @@
-<br />
+---
 
-![](/.github/assets/presentation.png)
+# Discusso
 
-<p align="center">
-  Twitter clone built in Next.js + TypeScript + Tailwind CSS using Cloud Firestore and Storage
-</p>
+Discusso is a social discussion platform where users can create and engage in discussions through posts, comments, and interactions. The platform provides robust search functionality to find users and discussions based on text and hashtags. Users can follow each other, like posts and comments, and view the engagement metrics of their discussions.
 
-## Preview 🎬
+## Table of Contents
 
-https://user-images.githubusercontent.com/55032197/201472767-9db0177a-79b5-4913-8666-1744102b0ad7.mp4
+- [Features](#features)
+- [Technology Stack](#technology-stack)
+- [System Architecture](#system-architecture)
+- [Database Schema](#database-schema)
+- [API Endpoints](#api-endpoints)
+- [Setup Instructions](#setup-instructions)
+- [Testing](#testing)
+- [Documentation](#documentation)
+- [Contributing](#contributing)
+- [License](#license)
 
-## Features ✨
+## Features
 
-- Authentication with Firebase Authentication
-- Strongly typed React components with TypeScript
-- Users can add tweets, like, retweet, and reply
-- Users can delete tweets, add a tweet to bookmarks, and pin their tweet
-- Users can add images and GIFs to tweet
-- Users can follow and unfollow other users
-- Users can see their and other followers and the following list
-- Users can see all users and the trending list
-- Realtime update likes, retweets, and user profile
-- Realtime trending data from Twitter API
-- User can edit their profile
-- Responsive design for mobile, tablet, and desktop
-- Users can customize the site color scheme and color background
-- All images uploads are stored on Firebase Cloud Storage
+1. **User Management**: Sign up, log in, update, delete, and search users.
+2. **Discussions**: Create, update, delete, and search discussions by text and hashtags.
+3. **Interactions**: Comment on posts, like posts and comments, and reply to comments.
+4. **Follow System**: Follow and be followed by other users.
+5. **Engagement Metrics**: View count of posts.
+6. **Robust Search**: Find users and discussions using hashtags and text.
 
-## Tech 🛠
+## Technology Stack
 
-- [Next.js](https://nextjs.org)
-- [TypeScript](https://www.typescriptlang.org)
-- [Tailwind CSS](https://tailwindcss.com)
-- [Firebase](https://firebase.google.com)
-- [SWR](https://swr.vercel.app)
-- [Headless UI](https://headlessui.com)
-- [React Hot Toast](https://react-hot-toast.com)
-- [Framer Motion](https://framer.com)
+- **Backend**: Node.js with Express
+- **Database**: MongoDB
+- **Authentication**: JWT (JSON Web Token)
+- **Storage**: AWS S3 for images
+- **Frontend**: React.js (for Bonus UI)
+- **API Testing**: Postman
 
-## Development 💻
+## System Architecture
 
-Here are the steps to run the project locally.
+The system follows a microservice architecture to handle different functionalities. The services include:
 
-1. Clone the repository
+- **User Service**: Handles user-related operations (create, update, delete, search).
+- **Auth Service**: Manages user authentication and authorization.
+- **Discussion Service**: Manages discussions (create, update, delete, search).
+- **Interaction Service**: Manages likes, comments, and replies.
+- **Search Service**: Facilitates searching users and discussions.
 
-   ```bash
-   git clone https://github.com/ccrsxx/twitter-clone.git
-   ```
+## Database Schema
 
-1. Install dependencies
+### Users
 
-   ```bash
-   npm i
-   ```
+- _id: ObjectId
+- name: String
+- mobile: String (unique)
+- email: String (unique)
+- password: String (hashed)
+- followers: [ObjectId]
+- following: [ObjectId]
 
-1. Create a Firebase project and select the web app
+### Discussions
 
-1. Add your Firebase config to `.env.development`. Note that `NEXT_PUBLIC_MEASUREMENT_ID` is optional
+- _id: ObjectId
+- userId: ObjectId (reference to Users)
+- text: String
+- image: String (URL to S3)
+- hashtags: [String]
+- createdAt: Date
+- viewCount: Number
 
-1. Make sure you have enabled the following Firebase services:
+### Comments
 
-   - Authentication. Enable the Google sign-in method.
-   - Cloud Firestore. Create a database and set its location to your nearest region.
-   - Cloud Storage. Create a storage bucket.
+- _id: ObjectId
+- discussionId: ObjectId (reference to Discussions)
+- userId: ObjectId (reference to Users)
+- text: String
+- likes: [ObjectId] (reference to Users)
+- replies: [ObjectId] (self-reference for nested comments)
+- createdAt: Date
 
-1. Install Firebase CLI globally
+## API Endpoints
 
-   ```bash
-   npm i -g firebase-tools
-   ```
+### User Service
 
-1. Log in to Firebase
+- `POST /users`: Create User
+- `PUT /users/:id`: Update User
+- `DELETE /users/:id`: Delete User
+- `GET /users`: List Users
+- `GET /users/search`: Search Users by Name
 
-   ```bash
-   firebase login
-   ```
+### Auth Service
 
-1. Get your project ID
+- `POST /auth/signup`: Signup
+- `POST /auth/login`: Login
 
-   ```bash
-   firebase projects:list
-   ```
+### Discussion Service
 
-1. Select your project ID
+- `POST /discussions`: Create Discussion
+- `PUT /discussions/:id`: Update Discussion
+- `DELETE /discussions/:id`: Delete Discussion
+- `GET /discussions/tags`: Get Discussions by Tags
+- `GET /discussions/search`: Get Discussions by Text
 
-   ```bash
-   firebase use your-project-id
-   ```
+### Interaction Service
 
-1. At this point, you have two choices. Either run this project using the Firebase on the cloud or locally using emulator.
+- `POST /discussions/:id/comments`: Post Comment
+- `PUT /comments/:id`: Modify Comment
+- `DELETE /comments/:id`: Delete Comment
+- `POST /comments/:id/like`: Like Comment
+- `POST /comments/:id/reply`: Reply to Comment
+- `POST /discussions/:id/like`: Like Post
 
-   1. Using the Firebase Cloud Backend:
+## Setup Instructions
 
-      1. Deploy Firestore rules, Firestore indexes, and Cloud Storage rules
+### Prerequisites
 
-         ```bash
-         firebase deploy --except functions
-         ```
+- Node.js
+- MongoDB
+- AWS S3 account (for image storage)
 
-      1. Run the project
+### Backend Setup
 
-         ```bash
-         npm run dev
-         ```
+1. Clone the repository:
+    ```bash
+    git clone https://github.com/yourusername/discusso.git
+    cd discusso
+    ```
 
-   1. Using Firebase Local Emulator:
+2. Install dependencies:
+    ```bash
+    npm install
+    ```
 
-      1. Install [Java JDK version 11 or higher](https://jdk.java.net/) before proceeding. This is required to run the emulators.
+3. Set up environment variables in a `.env` file:
+    ```plaintext
+    MONGO_URI=your_mongo_uri
+    JWT_SECRET=your_jwt_secret
+    AWS_ACCESS_KEY_ID=your_aws_access_key_id
+    AWS_SECRET_ACCESS_KEY=your_aws_secret_access_key
+    AWS_S3_BUCKET_NAME=your_s3_bucket_name
+    ```
 
-      1. Set the environment variable `NEXT_PUBLIC_USE_EMULATOR` to `true` in `.env.development`. This will make the app use the emulators instead of the cloud backend.
+4. Start the server:
+    ```bash
+    npm start
+    ```
 
-      1. At this point, you can run the following command to have a fully functional Twitter clone running locally:
+### Frontend Setup (Bonus)
 
-         ```bash
-         npm run dev:emulators
-         ```
+1. Navigate to the frontend directory:
+    ```bash
+    cd frontend
+    ```
 
-> **_Note_**: When you deploy Firestore indexes rules, it might take a few minutes to complete. So before the indexes are enabled, you will get an error when you fetch the data from Firestore.<br><br>You can check the status of your Firestore indexes with the link below, replace `your-project-id` with your project ID: https://console.firebase.google.com/u/0/project/your-project-id/firestore/indexes
+2. Install dependencies:
+    ```bash
+    npm install
+    ```
 
-Optional:
+3. Start the frontend server:
+    ```bash
+    npm start
+    ```
 
-- If you want to get trending data from Twitter API, you need to create a Twitter developer account and get your API keys. Then add your API keys to `.env.development`. I hope Elon Musk doesn't make this API paid 😅.
-- If you want to make the user stats synced with the deleted tweets, you need to enable the Cloud Functions for Firebase. Then deploy the Cloud Functions.
+## Testing
+
+Use Postman to test the API endpoints. A Postman collection has been created to facilitate testing. Import the collection using the following link:
+
+[Postman Collection](#)
+
+## Documentation
+
+Detailed documentation of each API endpoint, including request and response formats, can be found in the `docs` directory.
+
+## Contributing
+
+We welcome contributions! Please read our [Contributing Guidelines](CONTRIBUTING.md) before submitting a pull request.
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+---

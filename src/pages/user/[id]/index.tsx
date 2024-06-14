@@ -54,7 +54,7 @@ export default function UserTweets(): JSX.Element {
         <Loading className='mt-5' />
       ) : !mergedTweets ? (
         <StatsEmpty
-          title={`@${username as string} hasn't tweeted`}
+          title={`@${username as string} hasn't Discussed`}
           description='When they do, their Tweets will show up here.'
         />
       ) : (
